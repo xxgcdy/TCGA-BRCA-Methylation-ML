@@ -1,12 +1,15 @@
-# 外部验证计划 / External validation plan
+# 外部验证方案与后续队列 / External validation protocol and follow-up cohorts
 
 外部验证的目标不是再次得到一个高AUC，而是检验TCGA训练的特征、预处理与阈值在独立实验和人群中是否仍成立。
 
-## 候选队列
+## 已完成队列
 
-1. [GSE52865](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52865)：HM450，57个样本（40个原发乳腺肿瘤、17个正常）；规模较小但标签清晰，适合作为第一优先级。GEO列出的raw归档约183 MB，完整数据约686 MB。
-2. [GSE69914](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69914)：HM450，407个样本，包含健康正常、配对癌旁和肿瘤；规模更大，但必须逐条核实样本标签和纳入规则。raw归档约2.3 GB。
-3. [GSE87177](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE87177)：HM450，119个样本，包含乳腺癌/癌旁上皮、细胞系和健康血液；组织来源异质，适合做域偏移或敏感性分析，不宜直接混成一个二分类测试集。
+[GSE52865](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52865)：HM450，57个样本（40个原发乳腺肿瘤、17个正常）。冻结验证已经完成；1000个训练期CpG全部覆盖，结果见`results/external_validation/GSE52865/`。该队列规模较小，不能单独证明广泛泛化。
+
+## 后续候选队列
+
+1. [GSE69914](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69914)：HM450，407个样本，包含健康正常、配对癌旁和肿瘤；规模更大，但必须逐条核实样本标签和纳入规则。
+2. [GSE87177](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE87177)：HM450，119个样本，包含乳腺癌/癌旁上皮、细胞系和健康血液；组织来源异质，适合做域偏移或敏感性分析，不宜直接混成一个二分类测试集。
 
 ## 冻结规则
 

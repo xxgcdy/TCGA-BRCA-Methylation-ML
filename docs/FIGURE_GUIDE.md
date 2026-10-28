@@ -7,7 +7,8 @@
 | `paired_dmp_volcano.png` | 哪些CpG同时显著且大效应？ | 存在大量方向明确的大效应位点 | 点数巨大，不能把显著等同因果 |
 | `top50_replicated_cpg_heatmap.png` | 可重复CpG能否区分样本？ | Top位点呈清晰肿瘤/正常模式 | 图用于描述，不是独立泛化证据 |
 | `GO_top20.png` / `KEGG_top20.png` | 差异位点邻近基因富集什么功能？ | 黏附/信号等通路富集 | 富集不代表激活或抑制 |
-| `test_roc_all_models.png` | 四模型排序如何？ | RF/LASSO最高，Transformer接近 | 单次划分且正常样本少 |
-| `model_metrics_patient_bootstrap_ci.png` | 排名的不确定性有多大？ | AUC较稳，特异度区间较宽 | bootstrap不能替代外部验证 |
-| `test_confusion_matrices.png` | 错误发生在哪一类？ | 四模型灵敏度相同，特异度有差异 | 1个正常样本改变特异度6.25个百分点 |
-| `transformer_architecture.png` | 当前Transformer实际怎么工作？ | 10-CpG patch、64维、2层 | 顺序位置而非基因组距离，patch可能跨染色体 |
+| `internal_models_corrected.png` | 修正后的四模型内部测试表现如何？ | 分组CV XGBoost最高，Transformer仍接近 | 单次划分且仅16个正常测试样本 |
+| `model_metrics_patient_bootstrap_ci.png` | 初始模型比较的不确定性有多大？ | AUC较稳，特异度区间较宽 | 对应初始模型版本；bootstrap不能替代外部验证 |
+| `transformer_architecture.png` | 初始Transformer如何工作？ | 10-CpG patch、64维、2层 | 该图记录初始顺序位置实现；修正版已消除跨染色体patch |
+| `masked_pretraining_ablation.png` | 预训练收益是否依赖标签比例和位置编码？ | 基因组位置设置小幅受益，其他设置不稳定 | 不支持“预训练普遍更优”的结论 |
+| `external_validation_gse52865.png` | 冻结模型能否迁移到独立队列？ | 排序能力较强，但阈值校准发生漂移 | 57例外部样本不足以证明临床泛化 |

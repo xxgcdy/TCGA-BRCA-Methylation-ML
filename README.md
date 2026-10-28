@@ -160,7 +160,7 @@ flowchart LR
 export METHYLATION_ROOT=/path/to/TCGA-BRCA-Methylation-ML
 ```
 
-详细执行顺序、输入文件结构和软件版本见[复现指南](docs/reproducibility.md)和[数据字典](docs/data_dictionary.md)。项目证据与风险见[项目审计](docs/PROJECT_AUDIT.md)，外部迁移方案见[外部验证计划](docs/EXTERNAL_VALIDATION_PLAN.md)，面试准备见[问答集](docs/INTERVIEW_QA.md)。本仓库原创代码采用[MIT许可证](LICENSE)；TCGA/GDC数据及第三方软件仍遵循各自条款，不因本仓库而被重新许可。
+详细执行顺序、输入文件结构和软件版本见[复现指南](docs/reproducibility.md)和[数据字典](docs/data_dictionary.md)。质量控制、泄漏审计和真实技术限制见[方法学与局限](docs/METHODOLOGY_AND_LIMITATIONS.md)，自监督实验设计见[Masked甲基化预训练设计](docs/SELF_SUPERVISED_PRETRAINING_DESIGN.md)，外部迁移方案见[外部验证计划](docs/EXTERNAL_VALIDATION_PLAN.md)。本仓库原创代码采用[MIT许可证](LICENSE)；TCGA/GDC数据及第三方软件仍遵循各自条款，不因本仓库而被重新许可。
 
 ---
 
@@ -315,7 +315,9 @@ External AUCs indicate transferable ranking, while frozen TCGA thresholds reveal
 │   ├── analysis_report.md
 │   ├── data_dictionary.md
 │   ├── reproducibility.md
-│   └── PROJECT_AUDIT.md
+│   ├── METHODOLOGY_AND_LIMITATIONS.md
+│   ├── SELF_SUPERVISED_PRETRAINING_DESIGN.md
+│   └── EXTERNAL_VALIDATION_PLAN.md
 └── environment/
 ```
 

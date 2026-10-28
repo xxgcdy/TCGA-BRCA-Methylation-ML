@@ -49,17 +49,22 @@ Feature selection used only the training split (limma top 1,000 CpGs). The valid
 |---|---:|---:|---:|---:|---:|
 | LASSO | 0.9926 | 0.9990 | 0.9701 | 0.9746 | 0.9375 |
 | Random forest | 0.9947 | 0.9993 | 0.9701 | 0.9746 | 0.9375 |
-| XGBoost | 0.8904 | 0.9985 | 0.9552 | 0.9746 | 0.8125 |
-| CpG-patch Transformer | 0.9799 | 0.9975 | 0.9552 | 0.9746 | 0.8125 |
+| XGBoost (patient-grouped CV) | 0.9958 | 0.9994 | 0.9776 | 0.9831 | 0.9375 |
+| Chromosome-safe Transformer (5-seed ensemble) | 0.9873 | 0.9983 | 0.9627 | 0.9576 | 1.0000 |
 
-The simple LASSO and random-forest baselines outperform the first compact Transformer on this dataset. External-cohort validation is required because TCGA tumor/normal separation is strong and the number of normals is limited.
+The corrected XGBoost uses five-fold patient-grouped cross-validation within the training split. The compact Transformer remains below the strongest conventional baselines on the internal test set. TCGA tumor/normal separation is strong and the number of normal test samples is limited.
 
 ## Transformer artifact
 
 - Input: 869 samples x 1,000 training-selected CpGs ordered by chromosome and hg19 coordinate.
 - Missing values before imputation: 2,092 (0.2407%); imputed using training-only per-token medians, with the original missing mask retained.
-- Architecture: 100 patches of 10 CpGs, dimension 64, 4 heads, 2 layers, 78,017 parameters.
-- CPU-only PyTorch environment is isolated under `envs/transformer`.
+- Corrected tokenization: 111 chromosome-local patches of up to 10 CpGs; 22 chromosome-end patches are padded and no patch crosses a chromosome boundary.
+- Architecture: dimension 64, 4 heads and 2 encoder layers; five random seeds were evaluated on CPU.
+- Masked methylation pretraining and positional ablations were run locally on an RTX 5090 D. Gains were small and configuration-dependent.
+
+## Independent external validation
+
+Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast tissues). All 1,000 training-selected CpGs were present, with no missing values in the extracted matrix. LASSO, random forest and corrected XGBoost each achieved ROC-AUC 1.0000. The genomic Transformer achieved ROC-AUC 0.9779 from random initialization and 0.9941 after masked pretraining. Frozen-threshold sensitivity and specificity showed calibration shift, so ranking and threshold-dependent performance are reported separately.
 
 ## Main output locations
 
@@ -76,5 +81,5 @@ The simple LASSO and random-forest baselines outperform the first compact Transf
 
 - This is a tumor-versus-adjacent-normal proof-of-concept, not a clinical diagnostic validation.
 - TCGA-BRCA contains substantial class imbalance and possible center/batch effects.
-- External cohorts and, ideally, raw-IDAT-level batch-aware preprocessing are needed before claiming generalization.
+- GSE52865 is small and differs from TCGA in cohort composition and preprocessing; additional external cohorts and raw-IDAT-level batch-aware analyses are needed before claiming broad generalization.
 - KEGG results depend on the cached mapping snapshot and should be regenerated when pathway definitions are updated.

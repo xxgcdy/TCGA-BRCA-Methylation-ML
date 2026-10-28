@@ -39,7 +39,7 @@ case "$STAGE" in
   evaluate)
     run python scripts/08_evaluation/evaluate_predictions.py
     run python scripts/08_evaluation/validate_project_evidence.py
-    run python scripts/08_evaluation/make_portfolio_figures.py
+    run python scripts/08_evaluation/make_research_figures.py
     ;;
   all)
     for s in prepare qc biology models evaluate; do run bash "$0" "$s"; done

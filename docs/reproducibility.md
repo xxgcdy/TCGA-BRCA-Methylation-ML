@@ -46,7 +46,7 @@ bash scripts/run_pipeline.sh evaluate
 16. `scripts/07_transformer/train_methylation_transformer.py`
 17. `scripts/08_evaluation/evaluate_predictions.py`
 18. `scripts/08_evaluation/validate_project_evidence.py`
-19. `scripts/08_evaluation/make_portfolio_figures.py`
+19. `scripts/08_evaluation/make_research_figures.py`
 20. `scripts/make_final_figures.R`
 
 Reliability and research extensions:

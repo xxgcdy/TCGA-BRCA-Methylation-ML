@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate portfolio figures from real QC, DMP, matrix, and model outputs."""
+"""Generate research figures from QC, DMP, matrix, and model outputs."""
 
 import json
 import os
@@ -145,4 +145,4 @@ ax.text(0.5, 0.085, "Sequence positions do not encode genomic distance  •  Fix
         ha="center", fontsize=8.7, color="#991B1B")
 save(fig, "transformer_architecture.png")
 
-print("Portfolio figures written to", OUT)
+print("Research figures written to", OUT)
