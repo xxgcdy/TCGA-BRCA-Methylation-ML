@@ -8,6 +8,8 @@
 
 本项目基于TCGA-BRCA Illumina HumanMethylation450（HM450）数据，建立了一套从真实公共数据到肿瘤分类模型的完整研究流程，包括甲基化质量控制、差异甲基化位点与区域分析、功能富集、传统机器学习以及轻量级Transformer模型。
 
+**核心贡献：** 将患者配对统计、芯片探针偏倚校正、患者级泄漏控制和可审计的模型比较放入同一流程；同时诚实保留Transformer未超过简单基线的结果，并把它转化为预训练与跨队列泛化的后续研究问题。
+
 > 本仓库提供可复现的分析代码、环境说明和经过筛选的汇总结果，不重新分发TCGA逐样本甲基化矩阵或原始数据。
 
 ### 数据集
@@ -38,6 +40,8 @@ flowchart LR
     J --> K
 ```
 
+![队列与QC流程](results/figures/cohort_qc_flow.png)
+
 描述性全队列DMP/DMR分析与预测建模严格分开。模型使用的1,000个CpG只通过训练集筛选，验证集和测试集标签没有参与特征选择。
 
 ### 质量控制与数据划分
@@ -65,6 +69,10 @@ flowchart LR
 
 ![配对DMP火山图](results/figures/paired_dmp_volcano.png)
 
+![全队列与配对Δβ一致性](results/figures/dmp_delta_beta_concordance.png)
+
+![可重复Top CpG热图](results/figures/top50_replicated_cpg_heatmap.png)
+
 ### 功能富集
 
 使用25,975个共同大效应CpG作为显著集合、全部390,644个QC后CpG作为背景，通过`missMethyl`校正HM450探针数偏倚。共有548个GO条目和14条KEGG通路达到FDR < 0.05。KEGG使用官方REST映射的本地缓存完成离线检验；头部结果包括嗅觉转导、神经活性配体—受体相互作用、细胞黏附、Rap1、钙和cAMP信号通路。通路富集表示相关基因附近差异甲基化较集中，不等同于通路功能已被直接激活或抑制。
@@ -86,7 +94,13 @@ flowchart LR
 
 ![独立测试集ROC曲线](results/figures/test_roc_all_models.png)
 
+![患者级bootstrap置信区间](results/figures/model_metrics_patient_bootstrap_ci.png)
+
+![测试集混淆矩阵](results/figures/test_confusion_matrices.png)
+
 轻量级Transformer能够学习有效的甲基化表征，但没有超过LASSO和随机森林。这与肿瘤—正常信号很强、任务接近线性可分以及训练样本有限相符。
+
+所有指标已由保存的逐样本概率独立重算。测试集134例中仅16例正常：LASSO/RF均正确识别15例正常，Transformer/XGBoost为13例。患者级2,000次bootstrap显示特异度置信区间较宽，因此不对小数点后的模型排名作过度解释。匿名预测和置信区间见[`results/evaluation/`](results/evaluation/)。
 
 ### Transformer设计
 
@@ -97,21 +111,27 @@ flowchart LR
 - 类别平衡采样，使用验证集AUC早停
 - CPU训练，最多使用8个线程
 
+![当前Transformer真实架构与限制](results/figures/transformer_architecture.png)
+
+当前位置表示是“可学习顺序位置 + 染色体embedding”，不是基因组距离编码；固定10-CpG patch也可能跨染色体边界。这两点已列为下一版明确的消融与修正项。
+
 ### 局限性
 
 - 测试集只有16个正常样本，特异度估计存在较大不确定性。
-- 当前使用一次固定的患者级划分；后续需要重复划分、嵌套交叉验证和bootstrap置信区间。
+- 当前使用一次固定的患者级划分；已补充患者级bootstrap，但仍需要重复划分和嵌套交叉验证。
 - 当前属于TCGA内部验证，尚需独立外部队列验证。
 - Transformer从随机参数开始训练，尚未进行Masked CpG/区域预训练。
 - 本项目使用组织甲基化数据，不能直接解释为血液早筛模型。
 
 ### 后续计划
 
-1. 补充bootstrap置信区间和重复患者级划分
+1. 完成重复患者级划分和嵌套交叉验证
 2. 在独立HM450/EPIC队列进行外部验证
 3. 开展Masked CpG或连续区域预训练
 4. 比较10%、25%、50%和100%标签条件下的微调效果
 5. 构建共识DMR并整合甲基化—基因表达关系
+
+P2决策已记录在[位置编码与自监督预训练计划](docs/P2_PRETRAINING_PLAN.md)：本机可识别RTX 5090 D，但当前PyTorch为CPU-only，尚未声称完成GPU训练。迁移前先修正跨染色体patch并定义少标签、多种子和外部验证对照。
 
 ### 复现与许可证
 
@@ -121,13 +141,15 @@ flowchart LR
 export METHYLATION_ROOT=/path/to/TCGA-BRCA-Methylation-ML
 ```
 
-详细执行顺序、输入文件结构和软件版本见[复现指南](docs/reproducibility.md)和[数据字典](docs/data_dictionary.md)。本仓库原创代码采用[MIT许可证](LICENSE)；TCGA/GDC数据及第三方软件仍遵循各自条款，不因本仓库而被重新许可。
+详细执行顺序、输入文件结构和软件版本见[复现指南](docs/reproducibility.md)和[数据字典](docs/data_dictionary.md)。项目证据与风险见[项目审计](docs/PROJECT_AUDIT.md)，外部迁移方案见[外部验证计划](docs/EXTERNAL_VALIDATION_PLAN.md)，面试准备见[问答集](docs/INTERVIEW_QA.md)。本仓库原创代码采用[MIT许可证](LICENSE)；TCGA/GDC数据及第三方软件仍遵循各自条款，不因本仓库而被重新许可。
 
 ---
 
 ## English version
 
 An end-to-end research workflow for tumor-versus-adjacent-normal classification using TCGA-BRCA Illumina HumanMethylation450 methylation data. The project combines methylation quality control, differential methylation analysis, genomic region analysis, functional enrichment, conventional machine learning, and a compact Transformer model.
+
+**Core contribution:** one auditable workflow integrating paired-patient statistics, array probe-bias correction, patient-level leakage controls, and model comparison. The Transformer result is reported as-is rather than optimized for presentation.
 
 > This repository contains reproducible analysis code and selected summary outputs. It does **not** redistribute TCGA sample-level methylation matrices or raw data.
 
@@ -186,6 +208,8 @@ The descriptive full-cohort DMP/DMR analyses and predictive modeling are intenti
 
 ![Paired DMP volcano plot](results/figures/paired_dmp_volcano.png)
 
+![Full-versus-paired delta-beta concordance](results/figures/dmp_delta_beta_concordance.png)
+
 ## Functional enrichment
 
 The common large-effect CpGs were tested with `missMethyl`, using all QC-passed CpGs as the background to correct for HM450 probe-number bias. A total of 548 GO terms and 14 KEGG pathways passed FDR < 0.05. KEGG enrichment used a locally cached official KEGG REST gene-pathway mapping; leading results included olfactory transduction, neuroactive ligand-receptor interaction, cell adhesion, Rap1, calcium, and cAMP signaling. Enrichment indicates concentration of differential methylation near pathway genes and does not by itself establish pathway activation or repression.
@@ -207,7 +231,11 @@ Within the training split, all 390,644 CpGs were tested with limma on M-values. 
 
 ![Held-out test ROC curves](results/figures/test_roc_all_models.png)
 
+![Patient-level bootstrap confidence intervals](results/figures/model_metrics_patient_bootstrap_ci.png)
+
 The compact Transformer learned a useful methylation representation but did not outperform the simpler LASSO and Random Forest baselines. This is consistent with the strong, nearly linearly separable tumor-normal signal and the limited number of training samples.
+
+Metrics were independently recomputed from saved sample-level probabilities. Because only 16 normal samples are present in the 134-sample test set, specificity has wide uncertainty. Anonymized predictions and 2,000 patient-level bootstrap replicates are summarized in [`results/evaluation/`](results/evaluation/).
 
 ## Transformer design
 
@@ -217,6 +245,10 @@ The compact Transformer learned a useful methylation representation but did not 
 - 78,017 trainable parameters
 - Class-balanced sampling and validation-AUC early stopping
 - CPU-only training with at most eight threads
+
+![Implemented Transformer architecture and limitations](results/figures/transformer_architecture.png)
+
+The implemented positional representation is learned sequence position plus chromosome embedding—not genomic-distance-aware encoding. Fixed 10-CpG patches can also cross chromosome boundaries; these are explicit targets for the next ablation.
 
 ## Repository structure
 
@@ -229,15 +261,18 @@ The compact Transformer learned a useful methylation representation but did not 
 │   ├── 04_dmr/
 │   ├── 05_enrichment/
 │   ├── 06_model_training/
-│   └── 07_transformer/
+│   ├── 07_transformer/
+│   └── 08_evaluation/
 ├── results/
 │   ├── figures/
 │   ├── model_metrics/
-│   └── summary_tables/
+│   ├── summary_tables/
+│   └── evaluation/
 ├── docs/
 │   ├── analysis_report.md
 │   ├── data_dictionary.md
-│   └── reproducibility.md
+│   ├── reproducibility.md
+│   └── PROJECT_AUDIT.md
 └── environment/
 ```
 
@@ -251,10 +286,12 @@ export METHYLATION_ROOT=/path/to/TCGA-BRCA-Methylation-ML
 
 See [docs/reproducibility.md](docs/reproducibility.md) for the expected project layout, execution order, software environments, and data-access notes.
 
+For a staged entry point, run `bash scripts/run_pipeline.sh {prepare|qc|biology|models|evaluate|all}` after preparing the documented inputs.
+
 ## Limitations
 
 - The held-out test set contains only 16 normal samples, so specificity estimates have substantial uncertainty.
-- The current results use one fixed patient-level split; repeated nested cross-validation and bootstrap confidence intervals are future work.
+- The current results use one fixed patient-level split; patient bootstrap CIs are included, while repeated nested cross-validation remains future work.
 - This is an internal TCGA evaluation. Independent external-cohort validation is required.
 - The Transformer was trained from random initialization; masked methylation pretraining has not yet been evaluated.
 - The analysis uses tissue methylation and is not evidence for a blood-based screening assay.

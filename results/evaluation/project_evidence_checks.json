@@ -1,0 +1,60 @@
+{
+  "patient_overlap_between_splits": 0,
+  "split_sample_counts": [
+    {
+      "split": "test",
+      "sample_type": "Primary Tumor",
+      "n": 118
+    },
+    {
+      "split": "test",
+      "sample_type": "Solid Tissue Normal",
+      "n": 16
+    },
+    {
+      "split": "train",
+      "sample_type": "Primary Tumor",
+      "n": 538
+    },
+    {
+      "split": "train",
+      "sample_type": "Solid Tissue Normal",
+      "n": 66
+    },
+    {
+      "split": "validation",
+      "sample_type": "Primary Tumor",
+      "n": 117
+    },
+    {
+      "split": "validation",
+      "sample_type": "Solid Tissue Normal",
+      "n": 14
+    }
+  ],
+  "n_samples": 869,
+  "n_cases": 772,
+  "selected_features": 1000,
+  "selected_feature_ids_unique": true,
+  "selected_p_values_nondecreasing": true,
+  "test_sample_sets_identical_across_models": true,
+  "test_labels_consistent_across_models": true,
+  "test_samples_per_model": {
+    "CpGPatchTransformer": 134,
+    "LASSO": 134,
+    "RandomForest": 134,
+    "XGBoost": 134
+  },
+  "transformer_matrix_shape": [
+    869,
+    1000
+  ],
+  "transformer_nan_after_imputation": 0,
+  "transformer_split_counts": {
+    "train": 604,
+    "validation": 131,
+    "test": 134
+  },
+  "transformer_feature_selection_attribute": "training-only limma top 1000; genome-coordinate token order",
+  "all_required_checks_passed": true
+}

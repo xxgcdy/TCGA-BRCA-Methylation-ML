@@ -1,0 +1,23 @@
+name: lightweight-validation
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax-and-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Python syntax
+        run: python -m compileall -q scripts
+      - name: Shell syntax
+        run: bash -n scripts/run_pipeline.sh scripts/05_enrichment/cache_kegg_mapping.sh
+      - name: Check public evidence files
+        run: |
+          test -s results/evaluation/model_metrics_recomputed.tsv
+          test -s results/evaluation/patient_bootstrap_95ci.tsv
+          test -s results/evaluation/project_evidence_checks.json

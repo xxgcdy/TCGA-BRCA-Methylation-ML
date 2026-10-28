@@ -1,0 +1,12 @@
+{
+  "seed": 20261028,
+  "bootstrap_unit": "patient",
+  "n_bootstrap_requested": 2000,
+  "models": [
+    "LASSO",
+    "RandomForest",
+    "XGBoost",
+    "CpGPatchTransformer"
+  ],
+  "metrics_recomputed_from_saved_probabilities": true
+}

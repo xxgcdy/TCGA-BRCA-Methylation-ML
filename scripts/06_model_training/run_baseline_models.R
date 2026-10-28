@@ -110,6 +110,8 @@ params <- list(objective = "binary:logistic", eval_metric = "auc", eta = 0.03,
 xgb <- xgb.train(params = params, data = dtr, nrounds = 500,
                  watchlist = list(train = dtr, validation = dva),
                  early_stopping_rounds = 30, verbose = 0)
+xgb_evaluation_log <- as.data.table(xgb$evaluation_log)
+fwrite(xgb_evaluation_log, file.path(out, "xgboost_evaluation_log.tsv"), sep = "\t")
 xgb.save(xgb, file.path(out, "xgboost.ubj"))
 add_results("XGBoost", predict(xgb, xva), predict(xgb, xte))
 
@@ -119,7 +121,12 @@ fwrite(metric_dt, file.path(out, "baseline_metrics.tsv"), sep = "\t")
 fwrite(pred_dt, file.path(out, "baseline_predictions.tsv.gz"), sep = "\t")
 summary <- list(n_train = length(tr), n_validation = length(va), n_test = length(te),
                 n_features = length(sel), feature_selection = "training-only limma top 1000",
-                patient_grouped_cv = TRUE, metrics = metric_dt)
+                patient_grouped_cv = TRUE,
+                xgboost = list(params = params,
+                               best_iteration_zero_based = xgb$best_iteration,
+                               best_score = xgb$best_score,
+                               evaluation_log_file = "xgboost_evaluation_log.tsv"),
+                metrics = metric_dt)
 write_json(summary, file.path(out, "baseline_summary.json"), pretty = TRUE, auto_unbox = TRUE)
 print(metric_dt)
 

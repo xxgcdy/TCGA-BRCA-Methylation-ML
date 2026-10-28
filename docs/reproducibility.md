@@ -16,6 +16,18 @@ All published scripts read this environment variable. If it is unset, they use t
 
 ## Suggested execution order
 
+The stage runner documents the dependency order and stops on the first failed command:
+
+```bash
+bash scripts/run_pipeline.sh prepare
+bash scripts/run_pipeline.sh qc
+bash scripts/run_pipeline.sh biology
+bash scripts/run_pipeline.sh models
+bash scripts/run_pipeline.sh evaluate
+```
+
+`all` runs all five stages. It does not download controlled or large sample-level data automatically; prepare the inputs described in the data dictionary first.
+
 1. `scripts/01_data_preparation/prepare_samples.py`
 2. `scripts/01_data_preparation/merge_beta_matrix.py`
 3. `scripts/01_data_preparation/export_hm450_annotation.R`
@@ -32,7 +44,10 @@ All published scripts read this environment variable. If it is unset, they use t
 14. `scripts/06_model_training/run_baseline_models.R`
 15. `scripts/07_transformer/build_transformer_dataset.py`
 16. `scripts/07_transformer/train_methylation_transformer.py`
-17. `scripts/make_final_figures.R`
+17. `scripts/08_evaluation/evaluate_predictions.py`
+18. `scripts/08_evaluation/validate_project_evidence.py`
+19. `scripts/08_evaluation/make_portfolio_figures.py`
+20. `scripts/make_final_figures.R`
 
 ## Leakage controls
 
@@ -40,11 +55,20 @@ All published scripts read this environment variable. If it is unset, they use t
 - The top 1,000 model CpGs are selected with limma using training samples only.
 - Imputation statistics are estimated from training samples only.
 - The validation split is used for classification thresholds and Transformer early stopping.
-- The test split is evaluated only after model development.
+- The test split is evaluated only after model development. Public evaluation code recomputes metrics from frozen predictions; it does not tune models.
+
+## Public evidence package
+
+- `anonymized_predictions.tsv.gz`: frozen test labels/probabilities with one-way anonymized identifiers.
+- `model_metrics_recomputed.tsv`: metrics recomputed without relying on model-training summaries.
+- `patient_bootstrap_95ci.tsv`: 2,000 patient-level bootstrap confidence intervals.
+- `project_evidence_checks.json`: split, feature and prediction consistency checks.
+
+The bootstrap samples patients rather than rows so that paired samples remain grouped.
 
 ## Compute
 
-The reported run used CPU execution capped at eight threads. The compact Transformer does not require a GPU. Raw data plus intermediate matrices required approximately 16 GB in this implementation; selected GitHub outputs are much smaller.
+The reported run used CPU execution capped at eight threads. The compact Transformer does not require a GPU. Raw data plus intermediate matrices required approximately 16 GB in this implementation; selected GitHub outputs are much smaller. No GPU/pretraining result is claimed in the current release.
 
 ## KEGG mapping and offline reproducibility
 
