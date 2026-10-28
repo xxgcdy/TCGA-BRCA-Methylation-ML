@@ -46,6 +46,6 @@ All published scripts read this environment variable. If it is unset, they use t
 
 The reported run used CPU execution capped at eight threads. The compact Transformer does not require a GPU. Raw data plus intermediate matrices required approximately 16 GB in this implementation; selected GitHub outputs are much smaller.
 
-## Known limitations
+## KEGG mapping and offline reproducibility
 
-Direct KEGG retrieval from R timed out on the analysis server. The official human gene-pathway links and pathway names were therefore downloaded once from the KEGG REST API, cached locally, and supplied to `missMethyl::gsameth`. This preserves HM450 probe-number bias correction while making the enrichment step reproducible without repeated network calls.
+The official human gene-pathway links and pathway names were downloaded from the KEGG REST API and cached locally before enrichment. The cached mapping was supplied to `missMethyl::gsameth`, preserving HM450 probe-number bias correction while avoiding repeated network requests. Because KEGG pathway definitions are updated over time, regenerate the cache when reproducing the analysis with a newer pathway release.
