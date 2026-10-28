@@ -25,14 +25,12 @@ def save(fig, name):
 # Cohort and probe flow from saved QC summaries.
 prep = json.loads((ROOT / "results/qc/sample_preparation_summary.json").read_text())
 qc = json.loads((ROOT / "results/qc/qc_filter_summary.json").read_text())
-fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+fig, axes = plt.subplots(1, 2, figsize=(12, 5.2))
 sample_labels = ["GDC files", "Unique biological\nsamples", "QC-passed\nsamples"]
 sample_values = [prep["input_files"], prep["unique_samples"], qc["retained_samples"]]
 axes[0].bar(sample_labels, sample_values, color=["#9CA3AF", "#56B4E9", COLORS["accent"]])
 for i, value in enumerate(sample_values):
     axes[0].text(i, value + 10, f"{value:,}", ha="center", fontweight="bold")
-axes[0].text(1, 80, "2 technical replicates removed", ha="center", fontsize=9)
-axes[0].text(2, 80, "773 tumor / 96 normal", ha="center", fontsize=9)
 axes[0].set_ylim(0, 980); axes[0].set_ylabel("Count"); axes[0].set_title("Sample flow")
 probe_labels = ["HM450 rows", "All-chromosome\nQC probes", "Autosomal\nanalysis probes"]
 probe_values = [qc["input_probes"], qc["retained_probes_all_chromosomes"], qc["retained_probes_autosomal"]]
@@ -40,7 +38,12 @@ axes[1].bar(probe_labels, probe_values, color=["#9CA3AF", "#56B4E9", COLORS["acc
 for i, value in enumerate(probe_values):
     axes[1].text(i, value + 6000, f"{value:,}", ha="center", fontweight="bold")
 axes[1].set_ylim(0, 540000); axes[1].set_ylabel("CpG probes"); axes[1].set_title("Probe filtering")
-fig.suptitle("TCGA-BRCA HM450 cohort construction", fontweight="bold")
+fig.suptitle("TCGA-BRCA HM450 cohort construction", fontweight="bold", y=0.98)
+fig.text(0.27, 0.035, "890 files → 888 unique samples → 869 QC-passed samples",
+         ha="center", fontsize=9, color="#374151")
+fig.text(0.27, 0.012, "2 technical replicates removed; final cohort: 773 tumor / 96 normal",
+         ha="center", fontsize=8.5, color="#374151")
+fig.subplots_adjust(left=0.08, right=0.98, top=0.82, bottom=0.22, wspace=0.20)
 save(fig, "cohort_qc_flow.png")
 
 
@@ -113,26 +116,33 @@ save(fig, "model_metrics_patient_bootstrap_ci.png")
 
 
 # Architecture schematic derived from the implemented tensor flow.
-fig, ax = plt.subplots(figsize=(13, 3.4)); ax.axis("off")
+fig, ax = plt.subplots(figsize=(15.5, 4.6)); ax.axis("off")
 boxes = [
     ("β values", "[B, 1000]"),
-    ("Genomic order", "chr + hg19 position"),
-    ("Fixed CpG patches", "[B, 100, 10]"),
-    ("Linear + LN + GELU", "[B, 100, 64]"),
-    ("+ chromosome embedding\n+ learned sequence position", "+ [CLS]"),
-    ("2-layer Transformer", "4 heads; FFN=128"),
+    ("Genomic\nordering", "chr + hg19 position"),
+    ("Fixed CpG\npatches", "[B, 100, 10]"),
+    ("Linear projection\n+ LN + GELU", "[B, 100, 64]"),
+    ("Chromosome embedding\n+ sequence position", "+ [CLS] token"),
+    ("2-layer\nTransformer", "4 heads; FFN = 128"),
     ("MLP classifier", "[B] tumor logit"),
 ]
-xs = np.linspace(0.02, 0.86, len(boxes))
+box_width = 0.122
+xs = np.linspace(0.025, 0.855, len(boxes))
 for i, ((title, subtitle), x0) in enumerate(zip(boxes, xs)):
-    ax.add_patch(plt.Rectangle((x0, 0.34), 0.12, 0.34, facecolor="#E8F1FA", edgecolor="#2563EB", linewidth=1.2))
-    ax.text(x0 + 0.06, 0.55, title, ha="center", va="center", fontsize=8, fontweight="bold", wrap=True)
-    ax.text(x0 + 0.06, 0.40, subtitle, ha="center", va="center", fontsize=7, color="#374151", wrap=True)
+    ax.add_patch(plt.Rectangle((x0, 0.34), box_width, 0.36, facecolor="#E8F1FA", edgecolor="#2563EB", linewidth=1.2))
+    ax.text(x0 + box_width / 2, 0.56, title, ha="center", va="center",
+            fontsize=8.2, fontweight="bold", linespacing=1.15)
+    ax.text(x0 + box_width / 2, 0.405, subtitle, ha="center", va="center",
+            fontsize=7.1, color="#374151")
     if i < len(boxes) - 1:
-        ax.annotate("", xy=(xs[i + 1], 0.51), xytext=(x0 + 0.12, 0.51), arrowprops=dict(arrowstyle="->", color="#4B5563"))
-ax.text(0.5, 0.92, "Implemented CpG-patch Transformer (78,017 trainable parameters)", ha="center", fontsize=13, fontweight="bold")
-ax.text(0.5, 0.12, "Baseline limitation: learned sequence positions are not genomic-distance encoding; fixed patches may cross chromosome boundaries.",
-        ha="center", fontsize=9, color="#991B1B")
+        ax.annotate("", xy=(xs[i + 1] - 0.004, 0.52), xytext=(x0 + box_width + 0.004, 0.52),
+                    arrowprops=dict(arrowstyle="->", color="#4B5563", linewidth=1.1))
+ax.text(0.5, 0.92, "Implemented CpG-patch Transformer (78,017 trainable parameters)",
+        ha="center", fontsize=13, fontweight="bold")
+ax.text(0.5, 0.14, "Baseline limitations", ha="center", fontsize=9.2,
+        color="#991B1B", fontweight="bold")
+ax.text(0.5, 0.085, "Sequence positions do not encode genomic distance  •  Fixed patches may cross chromosome boundaries",
+        ha="center", fontsize=8.7, color="#991B1B")
 save(fig, "transformer_architecture.png")
 
 print("Portfolio figures written to", OUT)
