@@ -122,7 +122,7 @@ boxes = [
     ("Genomic\nordering", "chr + hg19 position"),
     ("Fixed CpG\npatches", "[B, 100, 10]"),
     ("Linear projection\n+ LN + GELU", "[B, 100, 64]"),
-    ("Chromosome embedding\n+ sequence position", "+ [CLS] token"),
+    ("Chromosome\nembedding\n+ sequence position", "+ [CLS] token"),
     ("2-layer\nTransformer", "4 heads; FFN = 128"),
     ("MLP classifier", "[B] tumor logit"),
 ]
