@@ -232,7 +232,7 @@ Within the training split, all 390,644 CpGs were tested with limma on M-values. 
 ![Held-out test ROC curves](results/figures/test_roc_all_models.png)
 
 ![Patient-level bootstrap confidence intervals](results/figures/model_metrics_patient_bootstrap_ci.png)
-
+![测试集混淆矩阵](results/figures/test_confusion_matrices.png)
 The compact Transformer learned a useful methylation representation but did not outperform the simpler LASSO and Random Forest baselines. This is consistent with the strong, nearly linearly separable tumor-normal signal and the limited number of training samples.
 
 Metrics were independently recomputed from saved sample-level probabilities. Because only 16 normal samples are present in the 134-sample test set, specificity has wide uncertainty. Anonymized predictions and 2,000 patient-level bootstrap replicates are summarized in [`results/evaluation/`](results/evaluation/).
