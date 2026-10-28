@@ -1,0 +1,33 @@
+{
+  "device": "cuda",
+  "torch_version": "2.11.0+cu128",
+  "cuda_version": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5090 D v2",
+  "gpu_capability": [
+    12,
+    0
+  ],
+  "n_samples": 869,
+  "n_patches": 111,
+  "cross_chromosome_patches": 0,
+  "position_modes": [
+    "none",
+    "sequence",
+    "genomic"
+  ],
+  "label_fractions": [
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "finetune_seeds": [
+    20261027,
+    20261028,
+    20261029
+  ],
+  "pretrain_epochs": 50,
+  "finetune_max_epochs": 50,
+  "mask_rate": 0.3,
+  "elapsed_minutes": 1.0024901032447815
+}

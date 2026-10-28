@@ -1,0 +1,62 @@
+{
+  "seeds": [
+    20261027,
+    20261028,
+    20261029,
+    20261030,
+    20261031
+  ],
+  "patch_size": 10,
+  "n_patches": 111,
+  "cross_chromosome_patches": 0,
+  "partial_patches": 22,
+  "best_epochs": [
+    10,
+    9,
+    6,
+    1,
+    1
+  ],
+  "test_mean_across_seeds": {
+    "n": 134.0,
+    "threshold": 0.09551050886511803,
+    "roc_auc": 0.9869703389830509,
+    "average_precision": 0.9983326548075002,
+    "accuracy": 0.9582089552238806,
+    "sensitivity": 0.9728813559322035,
+    "specificity": 0.85
+  },
+  "test_sd_across_seeds": {
+    "n": 0.0,
+    "threshold": 0.10702768215699611,
+    "roc_auc": 0.005170641890621105,
+    "average_precision": 0.0006278806748106796,
+    "accuracy": 0.004087481772426625,
+    "sensitivity": 0.009283433178053668,
+    "specificity": 0.07126096406869611
+  },
+  "ensemble_metrics": [
+    {
+      "seed": "ensemble",
+      "split": "validation",
+      "n": 131,
+      "threshold": 0.10809043794870377,
+      "roc_auc": 0.9993894993894994,
+      "average_precision": 0.9999275677241778,
+      "accuracy": 0.9923664122137404,
+      "sensitivity": 0.9914529914529915,
+      "specificity": 1.0
+    },
+    {
+      "seed": "ensemble",
+      "split": "test",
+      "n": 134,
+      "threshold": 0.10809043794870377,
+      "roc_auc": 0.9872881355932204,
+      "average_precision": 0.998346094972629,
+      "accuracy": 0.9626865671641791,
+      "sensitivity": 0.9576271186440678,
+      "specificity": 1.0
+    }
+  ]
+}

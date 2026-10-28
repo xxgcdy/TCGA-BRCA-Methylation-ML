@@ -1,0 +1,46 @@
+{
+  "seed": 20261028,
+  "feature_set": "training-only limma top 1000",
+  "tuning": "5-fold patient-grouped CV on training set; logloss selects parameters and rounds",
+  "selected": {
+    "max_depth": 2,
+    "eta": 0.02,
+    "min_child_weight": 3,
+    "subsample": 0.8,
+    "colsample_bytree": 0.6,
+    "best_round": 382,
+    "cv_logloss": 0.0867,
+    "cv_logloss_sd": 0.0463,
+    "cv_auc": 0.9982,
+    "cv_auc_sd": 0.0019
+  },
+  "validation_threshold": 0.1442,
+  "metrics": [
+    {
+      "model": "XGBoostGroupedCV",
+      "split": "validation",
+      "n": 131,
+      "n_tumor": 117,
+      "n_normal": 14,
+      "threshold": 0.1442,
+      "roc_auc": 1,
+      "average_precision": 1,
+      "accuracy": 1,
+      "sensitivity": 1,
+      "specificity": 1
+    },
+    {
+      "model": "XGBoostGroupedCV",
+      "split": "test",
+      "n": 134,
+      "n_tumor": 118,
+      "n_normal": 16,
+      "threshold": 0.1442,
+      "roc_auc": 0.9958,
+      "average_precision": 0.9994,
+      "accuracy": 0.9776,
+      "sensitivity": 0.9831,
+      "specificity": 0.9375
+    }
+  ]
+}

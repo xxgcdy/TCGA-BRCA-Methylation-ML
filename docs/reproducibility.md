@@ -49,6 +49,17 @@ bash scripts/run_pipeline.sh evaluate
 19. `scripts/08_evaluation/make_portfolio_figures.py`
 20. `scripts/make_final_figures.R`
 
+Reliability and research extensions:
+
+21. `scripts/06_model_training/run_xgboost_grouped_cv.R`
+22. `scripts/07_transformer/train_chromosome_safe_transformer.py`
+23. `scripts/09_pretraining/run_masked_pretraining_experiments.py`
+24. `scripts/09_pretraining/summarize_pretraining_results.py`
+25. `scripts/10_external_validation/prepare_gse52865.py`
+26. `scripts/10_external_validation/score_gse52865_baselines.R`
+27. `scripts/10_external_validation/score_gse52865_pretrained.py`
+28. `scripts/10_external_validation/summarize_external_validation.py`
+
 ## Leakage controls
 
 - Splitting is performed at the patient level.
@@ -68,7 +79,9 @@ The bootstrap samples patients rather than rows so that paired samples remain gr
 
 ## Compute
 
-The reported run used CPU execution capped at eight threads. The compact Transformer does not require a GPU. Raw data plus intermediate matrices required approximately 16 GB in this implementation; selected GitHub outputs are much smaller. No GPU/pretraining result is claimed in the current release.
+Server-side R and compact-Transformer runs were capped at eight CPU threads. Masked pretraining used a local RTX 5090 D with Python 3.10 and PyTorch 2.11.0+cu128; CUDA execution was verified with an actual matrix multiplication before training. The 72 fine-tuning runs completed in about one minute on this GPU. Raw data plus intermediate matrices required approximately 16 GB for the TCGA workflow; public selected outputs are much smaller.
+
+GSE52865 is intentionally excluded from Git. The verified source file is 228,875,072 bytes with SHA256 `8cc1dded61438a1acd72769d0d5c6069450ee0b2d8e0de6504648b4137f7423b`. The public preparation script should produce 57 samples, 1,000/1,000 frozen features, and zero missing beta values.
 
 ## KEGG mapping and offline reproducibility
 

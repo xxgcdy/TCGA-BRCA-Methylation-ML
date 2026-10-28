@@ -153,6 +153,7 @@ activemq-data/
 .env
 .envrc
 .venv
+.venv*/
 env/
 venv/
 ENV/
@@ -213,6 +214,7 @@ tempCodeRunnerFile.py
 
 # Project data and generated artifacts
 raw_beta/
+external/
 processed/
 annotation/
 manifests/
@@ -233,6 +235,12 @@ gdc-client*
 *sample_sheet*.tsv
 *clinical_metadata*.json
 *clinical_sample_metadata*.tsv
+
+# Sample-level prediction exports retain public accession identifiers locally.
+results/models/xgboost_grouped_cv/predictions.tsv.gz
+results/transformer_chromosome_safe/ensemble_predictions.tsv.gz
+results/masked_pretraining/predictions_all_runs.tsv.gz
+results/external_validation/**/**predictions*.tsv.gz
 
 # Marimo
 marimo/_static/

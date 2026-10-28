@@ -1,0 +1,3 @@
+model	split	n	n_tumor	n_normal	threshold	roc_auc	average_precision	accuracy	sensitivity	specificity
+XGBoostGroupedCV	validation	131	117	14	0.144153647124767	1	1	1	1	1
+XGBoostGroupedCV	test	134	118	16	0.144153647124767	0.995762711864407	0.999422807885115	0.977611940298507	0.983050847457627	0.9375

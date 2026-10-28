@@ -89,49 +89,68 @@ flowchart LR
 |---|---:|---:|---:|---:|---:|
 | LASSO | 0.9926 | 0.9990 | 0.9701 | 0.9746 | 0.9375 |
 | 随机森林 | 0.9947 | 0.9993 | 0.9701 | 0.9746 | 0.9375 |
-| XGBoost | 0.8904 | 0.9985 | 0.9552 | 0.9746 | 0.8125 |
-| CpG-patch Transformer | 0.9799 | 0.9975 | 0.9552 | 0.9746 | 0.8125 |
+| XGBoost（患者分组CV） | 0.9958 | 0.9994 | 0.9776 | 0.9831 | 0.9375 |
+| 染色体安全Transformer（5种子集成） | 0.9873 | 0.9983 | 0.9627 | 0.9576 | 1.0000 |
 
-![独立测试集ROC曲线](results/figures/test_roc_all_models.png)
+![修正后的独立测试集模型比较](results/figures/internal_models_corrected.png)
 
-![患者级bootstrap置信区间](results/figures/model_metrics_patient_bootstrap_ci.png)
+修复后的XGBoost只在训练集内进行5折患者分组交叉验证，以log-loss选择参数和382轮迭代，消除了原实现`best_iteration=0`导致的不可靠结果。轻量级Transformer能够学习有效表征，但仍没有稳定超过简单基线。
 
-![测试集混淆矩阵](results/figures/test_confusion_matrices.png)
-
-轻量级Transformer能够学习有效的甲基化表征，但没有超过LASSO和随机森林。这与肿瘤—正常信号很强、任务接近线性可分以及训练样本有限相符。
-
-所有指标已由保存的逐样本概率独立重算。测试集134例中仅16例正常：LASSO/RF均正确识别15例正常，Transformer/XGBoost为13例。患者级2,000次bootstrap显示特异度置信区间较宽，因此不对小数点后的模型排名作过度解释。匿名预测和置信区间见[`results/evaluation/`](results/evaluation/)。
+测试集134例中仅16例正常：LASSO、RF和修复后的XGBoost均识别15例，Transformer集成识别16例。由于正常样本很少，不能对特异度和小数点后的模型排名作过度解释。
 
 ### Transformer设计
 
 - 1,000个训练集筛选CpG，按染色体和hg19坐标排序
-- 每10个相邻CpG构成一个patch，每个样本100个patch
+- 在每条染色体内部，每10个相邻CpG构成一个patch；共111个patch，其中22个为染色体末端padding patch
 - 64维嵌入、4个注意力头、2层编码器
 - 78,017个可训练参数
 - 类别平衡采样，使用验证集AUC早停
-- CPU训练，最多使用8个线程
+- 5个随机种子，CPU训练最多使用8个线程
 
 ![当前Transformer真实架构与限制](results/figures/transformer_architecture.png)
 
-当前位置表示是“可学习顺序位置 + 染色体embedding”，不是基因组距离编码；固定10-CpG patch也可能跨染色体边界。这两点已列为下一版明确的消融与修正项。
+修正版patch不会跨越染色体边界（实测跨染色体patch数为0）。后续预训练实验进一步比较了无位置、顺序位置和“染色体embedding + hg19坐标Fourier特征”三种编码。
+
+### Masked Methylation预训练与少标签实验
+
+在本地RTX 5090 D上，只使用TCGA训练集进行30% patch masking的重建预训练，再以10%、25%、50%和100%训练标签进行三随机种子微调。全部72个微调实验约1分钟完成。基因组位置编码下，预训练相对随机初始化的平均测试AUC增益分别为+0.0009、+0.0032、+0.0019和+0.0028；无位置与顺序位置设置中增益不一致，部分为负。
+
+![Masked预训练与位置编码消融](results/figures/masked_pretraining_ablation.png)
+
+因此，本项目不声称预训练全面优于随机初始化。当前无标签样本仅来自604例训练样本，而且输入仍是监督筛选的1,000个CpG；结果更支持下一步扩大无标签预训练语料和改用不依赖标签的token集合。
+
+### 独立外部队列验证
+
+使用独立HM450队列GSE52865（40个乳腺肿瘤、17个正常乳腺组织）进行冻结验证。1000个TCGA训练期CpG全部命中；没有在外部标签上重新筛特征、重训模型或调整阈值。
+
+| 模型 | 外部ROC-AUC | 准确率 | 敏感度 | 特异度 |
+|---|---:|---:|---:|---:|
+| LASSO | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| 随机森林 | 1.0000 | 0.9649 | 1.0000 | 0.8824 |
+| XGBoost（患者分组CV） | 1.0000 | 0.9298 | 1.0000 | 0.7647 |
+| 基因组位置Transformer（随机初始化） | 0.9779 | 0.8947 | 0.9750 | 0.7059 |
+| 基因组位置Transformer（Masked预训练） | 0.9941 | 0.7368 | 0.6250 | 1.0000 |
+
+![GSE52865独立外部验证](results/figures/external_validation_gse52865.png)
+
+外部AUC说明排序能力可以迁移，但固定TCGA阈值下部分模型的敏感度/特异度明显漂移，尤其是预训练Transformer。这是跨队列概率校准问题，不能通过在外部测试集上重新选阈值来掩盖。
 
 ### 局限性
 
 - 测试集只有16个正常样本，特异度估计存在较大不确定性。
 - 当前使用一次固定的患者级划分；已补充患者级bootstrap，但仍需要重复划分和嵌套交叉验证。
-- 当前属于TCGA内部验证，尚需独立外部队列验证。
-- Transformer从随机参数开始训练，尚未进行Masked CpG/区域预训练。
+- 外部验证只有57例，且与TCGA在队列构成、预处理和组织来源上存在差异；需要更多队列验证。
+- Masked预训练仅使用604例TCGA训练样本和监督筛选的1,000个CpG，尚不足以证明大规模表征学习优势。
 - 本项目使用组织甲基化数据，不能直接解释为血液早筛模型。
 
 ### 后续计划
 
-1. 完成重复患者级划分和嵌套交叉验证
-2. 在独立HM450/EPIC队列进行外部验证
-3. 开展Masked CpG或连续区域预训练
-4. 比较10%、25%、50%和100%标签条件下的微调效果
-5. 构建共识DMR并整合甲基化—基因表达关系
+1. 扩大跨队列无标签预训练语料并采用非监督特征集合
+2. 完成重复患者级划分和嵌套交叉验证
+3. 在更多独立HM450/EPIC队列复核概率校准与泛化
+4. 构建共识DMR并整合甲基化—基因表达关系
 
-P2决策已记录在[位置编码与自监督预训练计划](docs/P2_PRETRAINING_PLAN.md)：本机可识别RTX 5090 D，但当前PyTorch为CPU-only，尚未声称完成GPU训练。迁移前先修正跨染色体patch并定义少标签、多种子和外部验证对照。
+实现、参数和完整结果见[可靠性、预训练与外部验证报告](docs/EXPERIMENT_UPDATE_2026-10-28.md)。
 
 ### 复现与许可证
 
@@ -226,29 +245,51 @@ Within the training split, all 390,644 CpGs were tested with limma on M-values. 
 |---|---:|---:|---:|---:|---:|
 | LASSO | 0.9926 | 0.9990 | 0.9701 | 0.9746 | 0.9375 |
 | Random Forest | 0.9947 | 0.9993 | 0.9701 | 0.9746 | 0.9375 |
-| XGBoost | 0.8904 | 0.9985 | 0.9552 | 0.9746 | 0.8125 |
-| CpG-patch Transformer | 0.9799 | 0.9975 | 0.9552 | 0.9746 | 0.8125 |
+| XGBoost (patient-grouped CV) | 0.9958 | 0.9994 | 0.9776 | 0.9831 | 0.9375 |
+| Chromosome-safe Transformer (5-seed ensemble) | 0.9873 | 0.9983 | 0.9627 | 0.9576 | 1.0000 |
 
-![Held-out test ROC curves](results/figures/test_roc_all_models.png)
+![Corrected held-out test comparison](results/figures/internal_models_corrected.png)
 
-![Patient-level bootstrap confidence intervals](results/figures/model_metrics_patient_bootstrap_ci.png)
-![测试集混淆矩阵](results/figures/test_confusion_matrices.png)
-The compact Transformer learned a useful methylation representation but did not outperform the simpler LASSO and Random Forest baselines. This is consistent with the strong, nearly linearly separable tumor-normal signal and the limited number of training samples.
+XGBoost was repaired using five-fold patient-grouped cross-validation entirely within the training split; log-loss selected both hyperparameters and 382 boosting rounds. The chromosome-safe Transformer learned a useful representation but still did not consistently outperform the simpler baselines.
 
-Metrics were independently recomputed from saved sample-level probabilities. Because only 16 normal samples are present in the 134-sample test set, specificity has wide uncertainty. Anonymized predictions and 2,000 patient-level bootstrap replicates are summarized in [`results/evaluation/`](results/evaluation/).
+Only 16 normal samples are present in the 134-sample test set, so specificity remains uncertain and decimal-level model rankings should not be over-interpreted.
 
 ## Transformer design
 
 - 1,000 training-selected CpGs ordered by chromosome and hg19 position
-- 10 neighboring CpGs per patch; 100 patches per sample
+- 10 neighboring CpGs per chromosome-local patch; 111 patches, including 22 padded chromosome-end patches
 - 64-dimensional embeddings, four attention heads, two encoder layers
 - 78,017 trainable parameters
 - Class-balanced sampling and validation-AUC early stopping
-- CPU-only training with at most eight threads
+- Five random seeds; CPU training with at most eight threads
 
 ![Implemented Transformer architecture and limitations](results/figures/transformer_architecture.png)
 
-The implemented positional representation is learned sequence position plus chromosome embedding—not genomic-distance-aware encoding. Fixed 10-CpG patches can also cross chromosome boundaries; these are explicit targets for the next ablation.
+The revised patcher has zero cross-chromosome patches. The pretraining ablation compares no positional encoding, learned sequence position, and chromosome embedding plus hg19 coordinate Fourier features.
+
+## Masked methylation pretraining and low-label fine-tuning
+
+Masked-patch reconstruction pretraining used only the TCGA training split and was run locally on an RTX 5090 D. Fine-tuning evaluated 10%, 25%, 50%, and 100% label fractions with three seeds and three positional modes (72 runs). Under genomic positional encoding, pretraining changed mean test AUC by +0.0009, +0.0032, +0.0019, and +0.0028, respectively. Gains were mixed or negative for several no-position and sequence-position settings.
+
+![Masked pretraining and positional ablation](results/figures/masked_pretraining_ablation.png)
+
+These results do not support a blanket claim that pretraining is superior. The unlabeled corpus is only the 604-sample TCGA training split, and the input remains a supervised-selected 1,000-CpG panel.
+
+## Independent external validation
+
+Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast tissues). All 1,000 TCGA training-selected CpGs were present; no external-label feature selection, model retraining, or threshold tuning was performed.
+
+| Model | External ROC-AUC | Accuracy | Sensitivity | Specificity |
+|---|---:|---:|---:|---:|
+| LASSO | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| Random Forest | 1.0000 | 0.9649 | 1.0000 | 0.8824 |
+| XGBoost (patient-grouped CV) | 1.0000 | 0.9298 | 1.0000 | 0.7647 |
+| Genomic Transformer (random initialization) | 0.9779 | 0.8947 | 0.9750 | 0.7059 |
+| Genomic Transformer (masked pretrained) | 0.9941 | 0.7368 | 0.6250 | 1.0000 |
+
+![GSE52865 independent external validation](results/figures/external_validation_gse52865.png)
+
+External AUCs indicate transferable ranking, while frozen TCGA thresholds reveal substantial calibration shift for several models—most clearly the pretrained Transformer. Thresholds were not retuned on the external test labels.
 
 ## Repository structure
 
@@ -262,7 +303,9 @@ The implemented positional representation is learned sequence position plus chro
 │   ├── 05_enrichment/
 │   ├── 06_model_training/
 │   ├── 07_transformer/
-│   └── 08_evaluation/
+│   ├── 08_evaluation/
+│   ├── 09_pretraining/
+│   └── 10_external_validation/
 ├── results/
 │   ├── figures/
 │   ├── model_metrics/
@@ -292,17 +335,16 @@ For a staged entry point, run `bash scripts/run_pipeline.sh {prepare|qc|biology|
 
 - The held-out test set contains only 16 normal samples, so specificity estimates have substantial uncertainty.
 - The current results use one fixed patient-level split; patient bootstrap CIs are included, while repeated nested cross-validation remains future work.
-- This is an internal TCGA evaluation. Independent external-cohort validation is required.
-- The Transformer was trained from random initialization; masked methylation pretraining has not yet been evaluated.
+- External validation currently contains only 57 samples and differs from TCGA in cohort composition and preprocessing; more cohorts are needed.
+- Masked pretraining used only 604 TCGA training samples and a supervised-selected 1,000-CpG panel, limiting claims about large-scale representation learning.
 - The analysis uses tissue methylation and is not evidence for a blood-based screening assay.
 
 ## Planned extensions
 
-1. Bootstrap confidence intervals and repeated patient-level splits
-2. External HM450/EPIC cohort validation
-3. Masked CpG/region pretraining
-4. Low-label fine-tuning experiments at 10%, 25%, 50%, and 100% label availability
-5. Consensus DMR construction and methylation-expression integration
+1. Expand unlabeled multi-cohort pretraining with a label-independent feature vocabulary
+2. Add repeated patient-level splits and nested cross-validation
+3. Validate calibration and generalization in additional HM450/EPIC cohorts
+4. Build consensus DMRs and integrate methylation with gene expression
 
 ## License and data use
 

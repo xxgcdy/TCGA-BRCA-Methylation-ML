@@ -1,0 +1,84 @@
+{
+  "cohort": "GSE52865",
+  "frozen_tcga_features": 1000,
+  "models": [
+    {
+      "position_mode": "none",
+      "initialization": "random",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.36149051000000004,
+      "roc_auc": 0.9794117647058823,
+      "average_precision": 0.9935185185185185,
+      "accuracy": 0.9473684210526315,
+      "sensitivity": 0.925,
+      "specificity": 1.0
+    },
+    {
+      "position_mode": "none",
+      "initialization": "pretrained",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.03193418366666667,
+      "roc_auc": 0.6044117647058824,
+      "average_precision": 0.8048774741198405,
+      "accuracy": 0.7017543859649122,
+      "sensitivity": 1.0,
+      "specificity": 0.0
+    },
+    {
+      "position_mode": "sequence",
+      "initialization": "random",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.17667012666666668,
+      "roc_auc": 0.9455882352941176,
+      "average_precision": 0.9800320238349646,
+      "accuracy": 0.8947368421052632,
+      "sensitivity": 0.875,
+      "specificity": 0.9411764705882353
+    },
+    {
+      "position_mode": "sequence",
+      "initialization": "pretrained",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.17329128100000002,
+      "roc_auc": 0.8794117647058823,
+      "average_precision": 0.9595818138802534,
+      "accuracy": 0.7017543859649122,
+      "sensitivity": 1.0,
+      "specificity": 0.0
+    },
+    {
+      "position_mode": "genomic",
+      "initialization": "random",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.35073197,
+      "roc_auc": 0.9779411764705882,
+      "average_precision": 0.9931818181818182,
+      "accuracy": 0.8947368421052632,
+      "sensitivity": 0.975,
+      "specificity": 0.7058823529411765
+    },
+    {
+      "position_mode": "genomic",
+      "initialization": "pretrained",
+      "label_fraction": 1.0,
+      "ensemble_seeds": 3,
+      "n": 57,
+      "threshold": 0.36894131666666663,
+      "roc_auc": 0.9941176470588234,
+      "average_precision": 0.9977272727272728,
+      "accuracy": 0.7368421052631579,
+      "sensitivity": 0.625,
+      "specificity": 1.0
+    }
+  ]
+}
