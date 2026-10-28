@@ -67,9 +67,11 @@ flowchart LR
 
 ### 功能富集
 
-使用25,975个共同大效应CpG作为显著集合、全部390,644个QC后CpG作为背景，通过`missMethyl::gometh`校正HM450探针数偏倚。共有548个GO条目达到FDR < 0.05。由于原分析服务器无法与KEGG REST端点建立SSL连接，本次没有报告KEGG结果。
+使用25,975个共同大效应CpG作为显著集合、全部390,644个QC后CpG作为背景，通过`missMethyl`校正HM450探针数偏倚。共有548个GO条目和14条KEGG通路达到FDR < 0.05。KEGG使用官方REST映射的本地缓存完成离线检验；头部结果包括嗅觉转导、神经活性配体—受体相互作用、细胞黏附、Rap1、钙和cAMP信号通路。通路富集表示相关基因附近差异甲基化较集中，不等同于通路功能已被直接激活或抑制。
 
 ![GO富集Top20](results/figures/GO_top20.png)
+
+![KEGG富集Top20](results/figures/KEGG_top20.png)
 
 ### 防止数据泄漏的模型设计
 
@@ -186,9 +188,11 @@ The descriptive full-cohort DMP/DMR analyses and predictive modeling are intenti
 
 ## Functional enrichment
 
-The common large-effect CpGs were tested with `missMethyl::gometh`, using all QC-passed CpGs as the background to correct for HM450 probe-number bias. A total of 548 GO terms passed FDR < 0.05. KEGG retrieval was not completed because the analysis server could not establish SSL connectivity to the KEGG REST endpoint.
+The common large-effect CpGs were tested with `missMethyl`, using all QC-passed CpGs as the background to correct for HM450 probe-number bias. A total of 548 GO terms and 14 KEGG pathways passed FDR < 0.05. KEGG enrichment used a locally cached official KEGG REST gene-pathway mapping; leading results included olfactory transduction, neuroactive ligand-receptor interaction, cell adhesion, Rap1, calcium, and cAMP signaling. Enrichment indicates concentration of differential methylation near pathway genes and does not by itself establish pathway activation or repression.
 
 ![Top GO terms](results/figures/GO_top20.png)
+
+![Top KEGG pathways](results/figures/KEGG_top20.png)
 
 ## Leakage-aware predictive modeling
 

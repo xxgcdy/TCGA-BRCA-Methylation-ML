@@ -28,10 +28,11 @@ All published scripts read this environment variable. If it is unset, they use t
 10. `scripts/04_dmr/run_dmr_full.R` and `run_dmr_paired.R`
 11. `scripts/04_dmr/summarize_dmr_overlap.R`
 12. `scripts/05_enrichment/run_missmethyl_enrichment.R`
-13. `scripts/06_model_training/run_baseline_models.R`
-14. `scripts/07_transformer/build_transformer_dataset.py`
-15. `scripts/07_transformer/train_methylation_transformer.py`
-16. `scripts/make_final_figures.R`
+13. Cache the official KEGG human pathway links under `annotation/kegg/`, then run `scripts/05_enrichment/run_kegg_local.R`
+14. `scripts/06_model_training/run_baseline_models.R`
+15. `scripts/07_transformer/build_transformer_dataset.py`
+16. `scripts/07_transformer/train_methylation_transformer.py`
+17. `scripts/make_final_figures.R`
 
 ## Leakage controls
 
@@ -47,4 +48,4 @@ The reported run used CPU execution capped at eight threads. The compact Transfo
 
 ## Known limitations
 
-KEGG enrichment requires access to the KEGG REST endpoint. The original server experienced an SSL connection failure, so only the complete bias-corrected GO output is reported here.
+Direct KEGG retrieval from R timed out on the analysis server. The official human gene-pathway links and pathway names were therefore downloaded once from the KEGG REST API, cached locally, and supplied to `missMethyl::gsameth`. This preserves HM450 probe-number bias correction while making the enrichment step reproducible without repeated network calls.

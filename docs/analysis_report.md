@@ -39,7 +39,7 @@
 
 - missMethyl `gometh` used 25,975 common large-effect CpGs against all 390,644 tested CpGs, correcting HM450 probe-number bias.
 - GO terms at FDR <0.05: 548.
-- KEGG was not completed because the server could not establish SSL to `rest.kegg.jp`; the failure is recorded and does not affect GO results.
+- KEGG used a locally cached official KEGG REST mapping with `missMethyl::gsameth`; 14 of 372 tested pathways passed FDR < 0.05.
 
 ## Prediction models
 
@@ -77,4 +77,4 @@ The simple LASSO and random-forest baselines outperform the first compact Transf
 - This is a tumor-versus-adjacent-normal proof-of-concept, not a clinical diagnostic validation.
 - TCGA-BRCA contains substantial class imbalance and possible center/batch effects.
 - External cohorts and, ideally, raw-IDAT-level batch-aware preprocessing are needed before claiming generalization.
-- KEGG should be rerun when its REST endpoint is reachable or from a licensed/local mapping snapshot.
+- KEGG results depend on the cached mapping snapshot and should be regenerated when pathway definitions are updated.
