@@ -1,0 +1,14 @@
+name: tcga-brca-methylation-ml
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scipy
+  - h5py
+  - scikit-learn
+  - matplotlib
+  - pytorch=2.5
+  - cpuonly

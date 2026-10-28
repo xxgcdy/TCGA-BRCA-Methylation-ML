@@ -1,0 +1,8 @@
+{
+  "n_background_cpgs": 390644,
+  "n_common_large_effect_cpgs": 25975,
+  "go_terms_fdr_0_05": 548,
+  "kegg_terms_fdr_0_05": null,
+  "kegg_error": "cannot open the connection to 'https://rest.kegg.jp/link/pathway/hsa'",
+  "method": "missMethyl gometh; GO/KEGG; 450K probe-number bias correction"
+}

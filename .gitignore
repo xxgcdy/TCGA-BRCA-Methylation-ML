@@ -211,6 +211,29 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Project data and generated artifacts
+raw_beta/
+processed/
+annotation/
+manifests/
+metadata/
+envs/
+logs/
+tmp/
+tools/
+*.idat
+*.h5
+*.npy
+*.npz
+*.pt
+*.ubj
+*.rds
+*.RData
+gdc-client*
+*sample_sheet*.tsv
+*clinical_metadata*.json
+*clinical_sample_metadata*.tsv
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

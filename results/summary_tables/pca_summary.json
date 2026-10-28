@@ -1,0 +1,20 @@
+{
+  "created_at_utc": "2026-10-27T11:49:49.652664+00:00",
+  "samples": 869,
+  "eligible_autosomal_probes_missing_le_0.05": 372377,
+  "pca_probes": 20000,
+  "imputed_values_in_pca_matrix": 78206,
+  "pc_explained_variance_ratio": {
+    "PC1": 0.2726426124572754,
+    "PC2": 0.09918376803398132,
+    "PC3": 0.05676443502306938,
+    "PC4": 0.03118869848549366,
+    "PC5": 0.02072257548570633,
+    "PC6": 0.015863245353102684,
+    "PC7": 0.014348635450005531,
+    "PC8": 0.012560720555484295,
+    "PC9": 0.010163825936615467,
+    "PC10": 0.009495791979134083
+  },
+  "pca_outlier_flags_within_sample_type_max_abs_robust_z_gt6": 0
+}

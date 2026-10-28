@@ -1,0 +1,39 @@
+{
+  "seed": 20261027,
+  "best_epoch": 1,
+  "best_val_auc": 1.0,
+  "architecture": {
+    "patch_size": 10,
+    "n_patches": 100,
+    "d_model": 64,
+    "heads": 4,
+    "layers": 2
+  },
+  "n_parameters": 78017,
+  "metrics": [
+    {
+      "split": "validation",
+      "n": 131,
+      "n_tumor": 117,
+      "n_normal": 14,
+      "threshold": 0.19942927360534668,
+      "roc_auc": 1.0,
+      "average_precision": 0.9999999999999999,
+      "accuracy": 1.0,
+      "sensitivity": 1.0,
+      "specificity": 1.0
+    },
+    {
+      "split": "test",
+      "n": 134,
+      "n_tumor": 118,
+      "n_normal": 16,
+      "threshold": 0.19942927360534668,
+      "roc_auc": 0.9798728813559323,
+      "average_precision": 0.997524047870235,
+      "accuracy": 0.9552238805970149,
+      "sensitivity": 0.9745762711864406,
+      "specificity": 0.8125
+    }
+  ]
+}

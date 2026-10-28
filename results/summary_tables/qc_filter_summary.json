@@ -1,0 +1,16 @@
+{
+  "created_at_utc": "2026-10-27T11:46:09.674627+00:00",
+  "input_samples": 888,
+  "retained_samples": 869,
+  "excluded_samples": 19,
+  "retained_primary_tumor": 773,
+  "retained_solid_tissue_normal": 96,
+  "input_probes": 486427,
+  "unannotated_probes": 915,
+  "probes_failing_missing_rate": 82749,
+  "random_loci": 4042,
+  "common_cpg_snp": 7295,
+  "common_sbe_snp": 3547,
+  "retained_probes_all_chromosomes": 399970,
+  "retained_probes_autosomal": 390644
+}

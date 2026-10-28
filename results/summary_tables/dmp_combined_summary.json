@@ -1,0 +1,20 @@
+{
+  "full_cohort": {
+    "n_probes": 390644,
+    "significant_fdr_0_05": 275082,
+    "significant_fdr_0_05_delta_beta_0_20": 28444,
+    "hypermethylated_delta20": 15681,
+    "hypomethylated_delta20": 12763
+  },
+  "paired": {
+    "n_probes": 390644,
+    "significant_fdr_0_05": 244021,
+    "significant_fdr_0_05_delta_beta_0_20": 28827,
+    "hypermethylated_delta20": 16775,
+    "hypomethylated_delta20": 12052
+  },
+  "overlap": {
+    "significant_delta20_both": 25975,
+    "pearson_delta_beta_all_probes": 0.9924
+  }
+}

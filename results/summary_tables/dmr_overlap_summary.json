@@ -1,0 +1,12 @@
+{
+  "full_dmrs": 35070,
+  "paired_dmrs": 32541,
+  "full_regions_with_any_paired_overlap": 31218,
+  "paired_regions_with_any_full_overlap": 31350,
+  "overlap_pairs": 31382,
+  "direction_consistent_overlap_pairs": 17273,
+  "high_confidence_overlap_pairs": 2988,
+  "high_confidence_unique_full_regions": 2986,
+  "high_confidence_unique_paired_regions": 2988,
+  "high_confidence_definition": "overlap, same direction, both >=3 CpGs, abs mean diff >=0.10, abs max diff >=0.20"
+}

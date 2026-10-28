@@ -1,0 +1,15 @@
+package	minimum_tested_version
+R	4.5.3
+limma	3.66.0
+DMRcate	3.6.0
+missMethyl	1.44.0
+minfi	1.56.0
+IlluminaHumanMethylation450kanno.ilmn12.hg19	0.6.1
+rhdf5	2.55.16
+data.table	NA
+jsonlite	NA
+matrixStats	NA
+glmnet	5.0
+ranger	0.18.0
+xgboost	3.2.1.1
+pROC	1.19.0.1

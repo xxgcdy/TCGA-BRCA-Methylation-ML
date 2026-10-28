@@ -1,0 +1,88 @@
+{
+  "n_train": 604,
+  "n_validation": 131,
+  "n_test": 134,
+  "n_features": 1000,
+  "feature_selection": "training-only limma top 1000",
+  "patient_grouped_cv": true,
+  "metrics": [
+    {
+      "model": "LASSO",
+      "split": "validation",
+      "n": 131,
+      "n_tumor": 117,
+      "n_normal": 14,
+      "threshold": 0.3601,
+      "roc_auc": 1,
+      "average_precision": 1,
+      "accuracy": 1,
+      "sensitivity": 1,
+      "specificity": 1
+    },
+    {
+      "model": "LASSO",
+      "split": "test",
+      "n": 134,
+      "n_tumor": 118,
+      "n_normal": 16,
+      "threshold": 0.3601,
+      "roc_auc": 0.9926,
+      "average_precision": 0.999,
+      "accuracy": 0.9701,
+      "sensitivity": 0.9746,
+      "specificity": 0.9375
+    },
+    {
+      "model": "RandomForest",
+      "split": "validation",
+      "n": 131,
+      "n_tumor": 117,
+      "n_normal": 14,
+      "threshold": 0.2498,
+      "roc_auc": 1,
+      "average_precision": 1,
+      "accuracy": 1,
+      "sensitivity": 1,
+      "specificity": 1
+    },
+    {
+      "model": "RandomForest",
+      "split": "test",
+      "n": 134,
+      "n_tumor": 118,
+      "n_normal": 16,
+      "threshold": 0.2498,
+      "roc_auc": 0.9947,
+      "average_precision": 0.9993,
+      "accuracy": 0.9701,
+      "sensitivity": 0.9746,
+      "specificity": 0.9375
+    },
+    {
+      "model": "XGBoost",
+      "split": "validation",
+      "n": 131,
+      "n_tumor": 117,
+      "n_normal": 14,
+      "threshold": 0.4913,
+      "roc_auc": 1,
+      "average_precision": 1,
+      "accuracy": 1,
+      "sensitivity": 1,
+      "specificity": 1
+    },
+    {
+      "model": "XGBoost",
+      "split": "test",
+      "n": 134,
+      "n_tumor": 118,
+      "n_normal": 16,
+      "threshold": 0.4913,
+      "roc_auc": 0.8904,
+      "average_precision": 0.9985,
+      "accuracy": 0.9552,
+      "sensitivity": 0.9746,
+      "specificity": 0.8125
+    }
+  ]
+}
