@@ -54,17 +54,22 @@ Masked-patch reconstruction used only the 604-sample TCGA training split. Three 
 
 The experiment demonstrates a reproducible pretraining pipeline, not a general advantage of pretraining. The unlabeled corpus is small and the token set remains supervised-selected.
 
+Validation ROC-AUC controlled early stopping and validation-derived thresholds within each run. Nevertheless, the 72 configurations were all inspected on the same internal test split. Their between-configuration comparison is therefore exploratory and post hoc; the internal test split cannot also be treated as an untouched confirmatory set for selecting the preferred architecture. A future confirmatory analysis should prespecify the configuration using validation data or nested cross-validation and evaluate it once on a new held-out cohort.
+
 ## External validation
 
-GSE52865 contains 40 breast tumors and 17 normal breast tissues. All 1,000 frozen CpGs were present and the extracted matrix had no missing values. LASSO, random forest, and corrected XGBoost each achieved an external ROC-AUC of 1.0000. The genomic Transformer achieved 0.9779 from random initialization and 0.9941 after masked pretraining.
+GSE52865 contains 40 primary breast tumors and 17 normal breast tissues profiled on HM450. It is an independent GEO cohort by accession and study source; sample-identity overlap with TCGA could not be tested from the available public identifiers. All 1,000 frozen CpGs were present and the extracted matrix had no missing values. LASSO, random forest, and corrected XGBoost each achieved an external ROC-AUC of 1.0000. The genomic Transformer achieved 0.9779 from random initialization and 0.9941 after masked pretraining.
 
 Frozen-threshold sensitivity and specificity reveal calibration shift despite high ROC-AUC. For example, the pretrained genomic Transformer has sensitivity 0.625 and specificity 1.000 at its TCGA validation threshold. Ranking performance and deployment calibration are therefore reported separately.
+
+Calibration was evaluated from frozen probabilities without fitting a recalibration model to external labels. Brier scores were 0.0729 (LASSO), 0.0096 (random forest), 0.0092 (corrected XGBoost), 0.2583 (genomic random initialization), and 0.2919 (genomic masked pretraining). Five-quantile-bin reliability curves and expected calibration error are provided as descriptive diagnostics; with only 57 samples, they should not be interpreted as precise population calibration estimates.
 
 The external cohort is small and differs from TCGA in cohort composition and preprocessing. One external dataset is not sufficient to establish clinical or cross-platform generalizability.
 
 ## Statistical uncertainty and interpretation boundaries
 
 - The internal test set contains only 16 normal samples; one normal error changes specificity by 6.25 percentage points.
+- The 72-run pretraining ablation repeatedly evaluates one internal test split. It supports exploratory characterization, not confirmatory architecture selection.
 - A single patient-level split cannot characterize split-to-split variation. Repeated nested evaluation remains desirable.
 - Bootstrap intervals quantify sampling uncertainty within the available test set but cannot replace independent cohorts.
 - Tissue methylation classification is not evidence for a blood-based screening assay.

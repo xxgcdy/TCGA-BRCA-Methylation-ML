@@ -59,6 +59,7 @@ Reliability and research extensions:
 26. `scripts/10_external_validation/score_gse52865_baselines.R`
 27. `scripts/10_external_validation/score_gse52865_pretrained.py`
 28. `scripts/10_external_validation/summarize_external_validation.py`
+29. `scripts/10_external_validation/plot_external_calibration.py`
 
 ## Leakage controls
 
@@ -66,7 +67,7 @@ Reliability and research extensions:
 - The top 1,000 model CpGs are selected with limma using training samples only.
 - Imputation statistics are estimated from training samples only.
 - The validation split is used for classification thresholds and Transformer early stopping.
-- The test split is evaluated only after model development. Public evaluation code recomputes metrics from frozen predictions; it does not tune models.
+- The test split is not used for fitting, feature selection, early stopping, or threshold tuning. The later 72-run pretraining study reports every configuration on the same test split, so cross-configuration comparisons are exploratory rather than an untouched confirmatory selection. Public evaluation code recomputes metrics from frozen predictions; it does not tune models.
 
 ## Public evidence package
 

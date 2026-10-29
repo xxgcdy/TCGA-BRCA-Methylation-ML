@@ -2,6 +2,8 @@
 
 [中文](#中文说明) | [English](#english-version)
 
+**快速入口 / Quick links：** [科研结果 / Research findings](#差异甲基化结果) · [模型研发 / Model development](#防止数据泄漏的模型设计) · [复现指南 / Reproducibility](docs/reproducibility.md) · [方法与局限 / Methodology and limitations](docs/METHODOLOGY_AND_LIMITATIONS.md)
+
 ## 中文说明
 
 ### 项目概述
@@ -51,6 +53,10 @@ flowchart LR
 - 主分析限定为常染色体探针。
 - 根据PC1–PC10的分样本类型稳健z分数，没有发现需要排除的PCA离群样本。
 - 按患者而不是按单个样本划分数据，保证同一患者的肿瘤和正常样本不会进入不同集合。
+
+PCA使用缺失率不超过5%的探针中方差最高的20,000个常染色体CpG。PC1和PC2分别解释27.26%和9.92%的方差；正常组织整体较集中，肿瘤样本分布更分散，符合肿瘤分子异质性较高的特征。该图适合用于观察全局结构与明显离群点，但不能单独排除批次效应、肿瘤纯度或细胞组成影响。
+
+![TCGA-BRCA HM450 PCA](results/figures/pca_pc1_pc2.png)
 
 | 数据集 | 总数 | 肿瘤 | 正常 |
 |---|---:|---:|---:|
@@ -119,9 +125,11 @@ flowchart LR
 
 因此，本项目不声称预训练全面优于随机初始化。当前无标签样本仅来自604例训练样本，而且输入仍是监督筛选的1,000个CpG；结果更支持下一步扩大无标签预训练语料和改用不依赖标签的token集合。
 
+验证集控制每次运行的早停和分类阈值，但72个配置都在同一内部测试集上进行了事后比较。因此这些结果属于探索性消融，不能把内部测试集视为仍未接触的最终确认集，也不能据此宣称某个配置已经被独立确认。严格的确认性比较需要先用验证集或嵌套交叉验证预选配置，再在新的留出队列上只评估一次。
+
 ### 独立外部队列验证
 
-使用独立HM450队列GSE52865（40个乳腺肿瘤、17个正常乳腺组织）进行冻结验证。1000个TCGA训练期CpG全部命中；没有在外部标签上重新筛特征、重训模型或调整阈值。
+使用[GSE52865](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52865) HM450队列（40个原发乳腺肿瘤、17个正常乳腺组织；[Stefansson et al., 2015](https://doi.org/10.1016/j.molonc.2014.10.012)）进行冻结验证。1000个TCGA训练期CpG全部命中；没有在外部标签上重新筛特征、重训模型或调整阈值。该队列按GEO研究来源独立于TCGA，但公共标识不足以进行受试者身份级去重。
 
 | 模型 | 外部ROC-AUC | 准确率 | 敏感度 | 特异度 |
 |---|---:|---:|---:|---:|
@@ -133,7 +141,9 @@ flowchart LR
 
 ![GSE52865独立外部验证](results/figures/external_validation_gse52865.png)
 
-外部AUC说明排序能力可以迁移，但固定TCGA阈值下部分模型的敏感度/特异度明显漂移，尤其是预训练Transformer。这是跨队列概率校准问题，不能通过在外部测试集上重新选阈值来掩盖。
+外部AUC说明排序能力可以迁移，但固定TCGA阈值下部分模型的敏感度/特异度明显漂移，尤其是预训练Transformer。这是跨队列概率校准问题，不能通过在外部测试集上重新选阈值来掩盖。冻结概率的Brier分数为：LASSO 0.0729、随机森林0.0096、XGBoost 0.0092、随机初始化Transformer 0.2583、预训练Transformer 0.2919。
+
+![GSE52865概率分布与校准](results/figures/external_calibration_gse52865.png)
 
 ### 局限性
 
@@ -141,6 +151,7 @@ flowchart LR
 - 当前使用一次固定的患者级划分；已补充患者级bootstrap，但仍需要重复划分和嵌套交叉验证。
 - 外部验证只有57例，且与TCGA在队列构成、预处理和组织来源上存在差异；需要更多队列验证。
 - Masked预训练仅使用604例TCGA训练样本和监督筛选的1,000个CpG，尚不足以证明大规模表征学习优势。
+- 72组消融重复使用同一内部测试集作探索性比较；该测试集不再是配置选择意义上的完全未接触确认集。
 - 本项目使用组织甲基化数据，不能直接解释为血液早筛模型。
 
 ### 后续计划
@@ -210,6 +221,10 @@ The descriptive full-cohort DMP/DMR analyses and predictive modeling are intenti
 - No PCA outliers were detected using within-sample-type robust z-scores across PCs 1-10.
 - Patients, rather than individual samples, were assigned to train/validation/test splits to keep paired tumor-normal samples together.
 
+PCA used the 20,000 most variable autosomal CpGs among probes with no more than 5% missingness. PC1 and PC2 explain 27.26% and 9.92% of the variance. Normal tissues form a relatively compact group, whereas tumors are more dispersed, consistent with greater molecular heterogeneity. This plot supports global structure and outlier inspection, but does not by itself exclude batch, tumor-purity, or cell-composition effects.
+
+![TCGA-BRCA HM450 PCA](results/figures/pca_pc1_pc2.png)
+
 | Split | Total | Tumor | Normal |
 |---|---:|---:|---:|
 | Train | 604 | 538 | 66 |
@@ -275,9 +290,11 @@ Masked-patch reconstruction pretraining used only the TCGA training split and wa
 
 These results do not support a blanket claim that pretraining is superior. The unlabeled corpus is only the 604-sample TCGA training split, and the input remains a supervised-selected 1,000-CpG panel.
 
+Validation data controlled early stopping and classification thresholds within each run. However, all 72 configurations were compared post hoc on the same internal test split. These are therefore exploratory ablations, not a confirmatory selection performed with an untouched final test set. A strict confirmatory comparison would prespecify the configuration using validation data or nested cross-validation and evaluate it once on a new held-out cohort.
+
 ## Independent external validation
 
-Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast tissues). All 1,000 TCGA training-selected CpGs were present; no external-label feature selection, model retraining, or threshold tuning was performed.
+Frozen models were evaluated on the [GSE52865](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52865) HM450 cohort (40 primary breast tumors and 17 normal breast tissues; [Stefansson et al., 2015](https://doi.org/10.1016/j.molonc.2014.10.012)). All 1,000 TCGA training-selected CpGs were present; no external-label feature selection, model retraining, or threshold tuning was performed. The cohort is independent by GEO study source, although public identifiers do not support subject-identity-level deduplication against TCGA.
 
 | Model | External ROC-AUC | Accuracy | Sensitivity | Specificity |
 |---|---:|---:|---:|---:|
@@ -289,7 +306,9 @@ Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast 
 
 ![GSE52865 independent external validation](results/figures/external_validation_gse52865.png)
 
-External AUCs indicate transferable ranking, while frozen TCGA thresholds reveal substantial calibration shift for several models—most clearly the pretrained Transformer. Thresholds were not retuned on the external test labels.
+External AUCs indicate transferable ranking, while frozen TCGA thresholds reveal substantial calibration shift for several models—most clearly the pretrained Transformer. Thresholds were not retuned on the external test labels. Frozen-probability Brier scores were 0.0729 for LASSO, 0.0096 for random forest, 0.0092 for XGBoost, 0.2583 for the randomly initialized Transformer, and 0.2919 for the pretrained Transformer.
+
+![GSE52865 probability distributions and calibration](results/figures/external_calibration_gse52865.png)
 
 ## Repository structure
 
@@ -339,6 +358,7 @@ For a staged entry point, run `bash scripts/run_pipeline.sh {prepare|qc|biology|
 - The current results use one fixed patient-level split; patient bootstrap CIs are included, while repeated nested cross-validation remains future work.
 - External validation currently contains only 57 samples and differs from TCGA in cohort composition and preprocessing; more cohorts are needed.
 - Masked pretraining used only 604 TCGA training samples and a supervised-selected 1,000-CpG panel, limiting claims about large-scale representation learning.
+- The 72-run ablation reused one internal test split for exploratory comparison, so that split is no longer an untouched confirmatory set for architecture selection.
 - The analysis uses tissue methylation and is not evidence for a blood-based screening assay.
 
 ## Planned extensions

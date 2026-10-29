@@ -33,7 +33,7 @@ The implemented task uses masked methylation modeling:
 | Random seeds | 3 |
 | Evaluation | frozen TCGA test split + frozen GSE52865 cohort |
 
-The comparison contains 72 fine-tuning runs. Validation ROC-AUC selects stopping epochs, and validation-derived thresholds remain frozen for test evaluation.
+The comparison contains 72 fine-tuning runs. Validation ROC-AUC selects stopping epochs, and validation-derived thresholds remain frozen for test evaluation. Because every configuration is then inspected on the same test split, comparisons across the 72 test results are exploratory rather than confirmatory. The test labels did not control training or thresholds, but repeated post hoc inspection means this split is not an untouched final test set for selecting a preferred architecture.
 
 ## Observed results
 
@@ -41,7 +41,7 @@ Under genomic positional encoding, pretraining changed mean internal test ROC-AU
 
 On GSE52865, the genomic model achieved ROC-AUC 0.9779 from random initialization and 0.9941 after pretraining. At the frozen TCGA threshold, the pretrained model had sensitivity 0.625 and specificity 1.000, demonstrating cross-cohort calibration shift.
 
-These results do not establish a general benefit of pretraining. The unlabeled corpus is small and the token set is supervised-selected. A stronger follow-up would use a larger multi-cohort unlabeled corpus, a label-independent CpG vocabulary, more random seeds, and prespecified calibration analyses.
+These results do not establish a general benefit of pretraining. The unlabeled corpus is small and the token set is supervised-selected. A stronger follow-up would use a larger multi-cohort unlabeled corpus, a label-independent CpG vocabulary, more random seeds, prespecified calibration analyses, and validation-only or nested-CV configuration selection followed by one-time evaluation on a new held-out cohort.
 
 ## Reproducible artifacts
 

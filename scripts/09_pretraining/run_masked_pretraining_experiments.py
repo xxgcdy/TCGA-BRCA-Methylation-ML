@@ -2,8 +2,10 @@
 """Masked methylation pretraining, position ablation, and low-label fine-tuning.
 
 Pretraining and label subsampling use training patients only. Validation labels
-select checkpoints and thresholds; the held-out test split is never used for
-model selection.
+select checkpoints and thresholds; the held-out test split is not used for
+fitting or within-run stopping. Because all configurations are later reported
+on that same test split, cross-configuration comparisons are exploratory rather
+than a one-time confirmatory evaluation.
 """
 
 import json

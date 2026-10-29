@@ -9,6 +9,7 @@
 - QC thresholds: sample missingness <=20%; probe missingness <=20%; remove random loci and common CpG/SBE SNP probes; main analysis restricted to autosomes.
 - Final analysis matrix: 869 samples (773 tumors, 96 normals) x 390,644 CpGs.
 - PCA outliers: 0 using within-sample-type robust z >6 across PCs 1-10.
+- PCA on the 20,000 most variable eligible autosomal CpGs explained 27.26% and 9.92% of variance on PC1 and PC2; tumors were more dispersed than normal tissues.
 
 ## Leakage-safe patient split
 
@@ -43,7 +44,7 @@
 
 ## Prediction models
 
-Feature selection used only the training split (limma top 1,000 CpGs). The validation split selected thresholds and early stopping. The test split was used only for final evaluation.
+Feature selection used only the training split (limma top 1,000 CpGs). The validation split selected thresholds and early stopping. The initial model comparison used the test split for final evaluation; the later 72-run pretraining ablation inspected the same split repeatedly, so cross-configuration ablation comparisons are explicitly treated as exploratory rather than confirmatory.
 
 | Model | Test ROC-AUC | Average precision | Accuracy | Sensitivity | Specificity |
 |---|---:|---:|---:|---:|---:|
@@ -64,7 +65,7 @@ The corrected XGBoost uses five-fold patient-grouped cross-validation within the
 
 ## Independent external validation
 
-Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast tissues). All 1,000 training-selected CpGs were present, with no missing values in the extracted matrix. LASSO, random forest and corrected XGBoost each achieved ROC-AUC 1.0000. The genomic Transformer achieved ROC-AUC 0.9779 from random initialization and 0.9941 after masked pretraining. Frozen-threshold sensitivity and specificity showed calibration shift, so ranking and threshold-dependent performance are reported separately.
+Frozen models were evaluated on GSE52865 (40 primary breast tumors and 17 normal breast tissues). All 1,000 training-selected CpGs were present, with no missing values in the extracted matrix. LASSO, random forest and corrected XGBoost each achieved ROC-AUC 1.0000. The genomic Transformer achieved ROC-AUC 0.9779 from random initialization and 0.9941 after masked pretraining. Frozen-threshold sensitivity and specificity showed calibration shift, so ranking and threshold-dependent performance are reported separately. Frozen-probability Brier scores ranged from 0.0092-0.0096 for random forest/XGBoost to 0.2583-0.2919 for the two genomic Transformer variants.
 
 ## Main output locations
 
@@ -82,4 +83,5 @@ Frozen models were evaluated on GSE52865 (40 breast tumors and 17 normal breast 
 - This is a tumor-versus-adjacent-normal proof-of-concept, not a clinical diagnostic validation.
 - TCGA-BRCA contains substantial class imbalance and possible center/batch effects.
 - GSE52865 is small and differs from TCGA in cohort composition and preprocessing; additional external cohorts and raw-IDAT-level batch-aware analyses are needed before claiming broad generalization.
+- All 72 ablation configurations were inspected on the same internal test split, so their comparison is exploratory rather than a one-time confirmatory test.
 - KEGG results depend on the cached mapping snapshot and should be regenerated when pathway definitions are updated.
